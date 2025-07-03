@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { EcosystemCard } from '@/components/EcosystemCard'
 import { ecosystems } from '@/data/ecosystems'
 import { useNavigate } from 'react-router-dom'
-import heroImage from '@/../public/assets/hero-ocean.jpg'
+import heroImage from '/assets/hero-ocean.jpg'
 import { APP_NAME } from '@/lib/constants'
 import { useState, useEffect } from 'react'
 
