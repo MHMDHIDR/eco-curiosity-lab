@@ -4,9 +4,48 @@ import { ecosystems } from '@/data/ecosystems'
 import { useNavigate } from 'react-router-dom'
 import heroImage from '@/assets/hero-ocean.jpg'
 import { APP_NAME } from '@/lib/constants'
+import { useState, useEffect } from 'react'
+
+// List of hero videos in the public/hero-videos directory
+const heroVideos = [
+  '/hero-videos/jellyfish.mp4',
+  '/hero-videos/frog.mp4',
+  '/hero-videos/tiny-bird.mp4',
+  '/hero-videos/penguin.mp4',
+]
 
 export function HomePage() {
   const navigate = useNavigate()
+
+  // State for cycling videos
+  const [videoIndex, setVideoIndex] = useState(() =>
+    Math.floor(Math.random() * heroVideos.length)
+  )
+  const [videoFailed, setVideoFailed] = useState(false)
+  const [videoLoaded, setVideoLoaded] = useState(false)
+  const [fade, setFade] = useState(true)
+  const FADE_DURATION = 500
+  const CYCLE_INTERVAL = 10000
+
+  // Cycle to a new random video every 10 seconds
+  useEffect(() => {
+    if (videoFailed) return // Don't cycle if fallback is active
+    const timer = setTimeout(() => {
+      setFade(false)
+      setTimeout(() => {
+        let nextIndex: number
+        do {
+          nextIndex = Math.floor(Math.random() * heroVideos.length)
+        } while (nextIndex === videoIndex && heroVideos.length > 1)
+        setVideoIndex(nextIndex)
+        setVideoLoaded(false)
+        setFade(true)
+      }, FADE_DURATION) // fade out duration
+    }, CYCLE_INTERVAL)
+    return () => clearTimeout(timer)
+  }, [videoIndex, videoFailed])
+
+  const selectedVideo = heroVideos[videoIndex]
 
   const handleExploreEcosystem = (ecosystemId: string) => {
     navigate(`/ecosystem/${ecosystemId}`)
@@ -14,18 +53,37 @@ export function HomePage() {
 
   return (
     <div className='min-h-screen bg-background'>
-      {/* Hero Section */}
       <section className='relative h-[60vh] md:h-[70vh] overflow-hidden'>
-        <img
-          src={heroImage}
-          alt='Underwater coral reef'
-          className='w-full h-full object-cover'
-        />
+        {/* Video background with fade and fallback to image */}
+        {!videoFailed ? (
+          <video
+            key={selectedVideo}
+            src={selectedVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-500 ${
+              fade && videoLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            onCanPlayThrough={() => setVideoLoaded(true)}
+            onError={() => setVideoFailed(true)}
+            style={{ display: videoLoaded ? 'block' : 'none' }}
+          />
+        ) : null}
+        {/* Fallback image if video fails or not loaded yet */}
+        {videoFailed || !videoLoaded ? (
+          <img
+            src={heroImage}
+            alt='Underwater coral reef'
+            className='w-full h-full object-cover absolute inset-0 transition-opacity duration-500 opacity-100'
+          />
+        ) : null}
         <div className='absolute inset-0 bg-gradient-to-r from-black/60 to-black/30' />
 
         <div className='absolute inset-0 flex items-center justify-center'>
           <div className='text-center text-white px-4 max-w-4xl'>
-            <h1 className='text-4xl md:text-6xl font-bold mb-6 leading-tight'>
+            <h1 className='text-4xl md:text-6xl font-bold mb-6 leading-loose'>
               Discover Earth's
               <span className='block bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent'>
                 Amazing Biodiversity
@@ -47,7 +105,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Ecosystems Section */}
       <section className='py-16 px-4'>
         <div className='container mx-auto'>
           <div className='text-center mb-12'>
@@ -70,7 +127,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Call to Action */}
       <section className='py-16 bg-muted'>
         <div className='container mx-auto text-center px-4'>
           <h2 className='text-3xl font-bold mb-4'>
