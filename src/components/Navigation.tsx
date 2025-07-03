@@ -17,7 +17,7 @@ export function Navigation() {
             className='flex items-center space-x-2 cursor-pointer group select-none'
             onClick={() => navigate('/')}
           >
-            <div className='size-8 bg-gradient-hero rounded-lg flex items-center justify-center group-hover:shadow-glow transition-all duration-300'>
+            <div className='size-8 bg-gradient-hero-light rounded-lg flex items-center justify-center group-hover:shadow-glow transition-all duration-300'>
               <span className='text-white font-bold text-lg'>
                 <img src='/logo.png' alt='logo' className='size-8' />
               </span>
