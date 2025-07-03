@@ -22,7 +22,7 @@ export function Navigation() {
                 <img src='/logo.png' alt='logo' className='size-8' />
               </span>
             </div>
-            <span className='text-xl font-bold text-foreground'>{APP_NAME}</span>
+            <span className='text-xl font-extrabold text-foreground'>{APP_NAME}</span>
           </div>
 
           <div className='flex items-center space-x-2'>

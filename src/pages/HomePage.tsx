@@ -83,9 +83,9 @@ export function HomePage() {
 
         <div className='absolute inset-0 flex items-center justify-center'>
           <div className='text-center text-white px-4 max-w-4xl'>
-            <h1 className='text-4xl md:text-6xl font-bold mb-6 leading-loose'>
+            <h1 className='text-3xl md:text-5xl font-bold pb-4 mb-6'>
               Discover Earth's
-              <span className='block bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent'>
+              <span className='block bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent leading-relaxed'>
                 Amazing Biodiversity
               </span>
             </h1>
