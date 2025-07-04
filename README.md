@@ -6,6 +6,10 @@
 
 Eco Curiosity Lab is a modern, extensible web application designed to foster curiosity and knowledge about the animal kingdom. Our mission is to create a vibrant community of enthusiasts, researchers, and learners who share a passion for discovering and cataloging species from around the world. The platform is built to be both beautiful and highly functional, with a focus on performance, accessibility, and extensibility.
 
+# screenshot image
+
+![Eco Curiosity Lab Screenshot](./public/screenshot.png)
+
 ## Project Overview
 
 Eco Curiosity Lab enables users to:
