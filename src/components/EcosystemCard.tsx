@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Ecosystem } from '@/data/ecosystems'
+import { Ecosystem } from '@/lib/services'
 
 interface EcosystemCardProps {
   ecosystem: Ecosystem
@@ -34,7 +34,7 @@ export function EcosystemCard({ ecosystem, onExplore }: EcosystemCardProps) {
           <Button
             variant='ecosystem'
             size='sm'
-            onClick={() => onExplore(ecosystem.id)}
+            onClick={() => onExplore(ecosystem.slug)}
             className='rounded-full px-5 py-2 font-semibold shadow-md bg-gradient-to-r from-blue-400 to-emerald-400 text-white hover:from-blue-500 hover:to-emerald-500 transition-colors duration-200'
           >
             Explore

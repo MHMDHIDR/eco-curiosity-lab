@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { EcosystemCard } from '@/components/EcosystemCard'
-import { ecosystems } from '@/data/ecosystems'
+import { ecosystemService } from '@/lib/services'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import heroImage from '/assets/hero-ocean.jpg'
 import { APP_NAME } from '@/lib/constants'
 import { useState, useEffect } from 'react'
@@ -17,6 +18,18 @@ const heroVideos = [
 export function HomePage() {
   const navigate = useNavigate()
 
+  // Fetch ecosystems from API
+  const {
+    data: ecosystemsResponse,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['ecosystems'],
+    queryFn: () => ecosystemService.getAll(),
+  })
+
+  const ecosystems = ecosystemsResponse?.data.data || []
+
   // State for cycling videos
   const [videoIndex, setVideoIndex] = useState(() =>
     Math.floor(Math.random() * heroVideos.length)
@@ -29,64 +42,94 @@ export function HomePage() {
 
   // Cycle to a new random video every 10 seconds
   useEffect(() => {
-    if (videoFailed) return // Don't cycle if fallback is active
-    const timer = setTimeout(() => {
+    const interval = setInterval(() => {
       setFade(false)
       setTimeout(() => {
-        let nextIndex: number
-        do {
-          nextIndex = Math.floor(Math.random() * heroVideos.length)
-        } while (nextIndex === videoIndex && heroVideos.length > 1)
-        setVideoIndex(nextIndex)
+        setVideoIndex(Math.floor(Math.random() * heroVideos.length))
+        setVideoFailed(false)
         setVideoLoaded(false)
         setFade(true)
-      }, FADE_DURATION) // fade out duration
+      }, FADE_DURATION)
     }, CYCLE_INTERVAL)
-    return () => clearTimeout(timer)
-  }, [videoIndex, videoFailed])
 
-  const selectedVideo = heroVideos[videoIndex]
+    return () => clearInterval(interval)
+  }, [])
 
   const handleExploreEcosystem = (ecosystemId: string) => {
     navigate(`/ecosystem/${ecosystemId}`)
   }
 
+  // Handle loading and error states
+  if (isLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4'></div>
+          <p className='text-muted-foreground'>Loading ecosystems...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='text-center'>
+          <p className='text-red-500 mb-4'>Failed to load ecosystems</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className='min-h-screen bg-background'>
-      <section className='relative h-[60vh] md:h-[70vh] overflow-hidden'>
-        {/* Video background with fade and fallback to image */}
-        {!videoFailed ? (
-          <video
-            key={selectedVideo}
-            src={selectedVideo}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-500 ${
-              fade && videoLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            onCanPlayThrough={() => setVideoLoaded(true)}
-            onError={() => setVideoFailed(true)}
-            style={{ display: videoLoaded ? 'block' : 'none' }}
-          />
-        ) : null}
-        {/* Fallback image if video fails or not loaded yet */}
-        {videoFailed || !videoLoaded ? (
+    <div className='min-h-screen'>
+      {/* Hero Section */}
+      <section className='relative h-screen flex items-center justify-center overflow-hidden'>
+        {/* Background Video */}
+        <div className='absolute inset-0'>
+          {!videoFailed && (
+            <video
+              key={videoIndex}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className={`w-full h-full object-cover transition-opacity duration-${FADE_DURATION} ${
+                fade && videoLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoadedData={() => setVideoLoaded(true)}
+              onError={() => setVideoFailed(true)}
+            >
+              <source src={heroVideos[videoIndex]} type='video/mp4' />
+            </video>
+          )}
+
+          {/* Fallback Image */}
           <img
             src={heroImage}
-            alt='Underwater coral reef'
-            className='w-full h-full object-cover absolute inset-0 transition-opacity duration-500 opacity-100'
+            alt='Hero background'
+            className={`w-full h-full object-cover transition-opacity duration-${FADE_DURATION} ${
+              videoFailed || (!videoLoaded && fade) ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              position: videoFailed ? 'static' : 'absolute',
+              top: 0,
+              left: 0,
+            }}
           />
-        ) : null}
-        <div className='absolute inset-0 bg-gradient-to-r from-black/60 to-black/30' />
 
-        <div className='absolute inset-0 flex items-center justify-center'>
-          <div className='text-center text-white px-4 max-w-4xl'>
-            <h1 className='text-3xl md:text-5xl font-bold pb-4 mb-6'>
-              Discover Earth's
-              <span className='block bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent leading-relaxed'>
-                Amazing Biodiversity
+          {/* Dark overlay for better text readability */}
+          <div className='absolute inset-0 bg-black/40' />
+        </div>
+
+        {/* Hero Content */}
+        <div className='relative z-10 text-center text-white px-4'>
+          <div className='max-w-4xl mx-auto'>
+            <h1 className='text-4xl md:text-6xl lg:text-7xl font-bold mb-6'>
+              Welcome to{' '}
+              <span className='bg-gradient-to-r from-blue-400 via-green-400 to-blue-500 bg-clip-text text-transparent'>
+                {APP_NAME}
               </span>
             </h1>
             <p className='text-lg md:text-xl mb-8 text-gray-200 max-w-2xl mx-auto'>

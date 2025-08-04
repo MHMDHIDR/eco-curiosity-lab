@@ -1,13 +1,24 @@
 import { Button } from '@/components/ui/button'
 import { APP_NAME } from '@/lib/constants'
-import { Search, BookOpen, Star } from 'lucide-react'
+import { Search, BookOpen, Star, User, LogIn, LogOut } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function Navigation() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, logout } = useAuth()
 
   const isActive = (path: string) => location.pathname === path
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
 
   return (
     <nav className='border-b border-primary/20 shadow-xs bg-white/30 dark:bg-black/30 backdrop-blur-md sticky top-0 z-50'>
@@ -55,6 +66,34 @@ export function Navigation() {
               <BookOpen className='h-4 w-4' />
               <span className='hidden sm:inline'>About</span>
             </Button>
+
+            {user ? (
+              <>
+                <Button variant='ghost' size='sm' className='flex items-center space-x-1'>
+                  <User className='h-4 w-4' />
+                  <span className='hidden sm:inline'>{user.name}</span>
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={handleLogout}
+                  className='flex items-center space-x-1'
+                >
+                  <LogOut className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Logout</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={() => navigate('/login')}
+                className='flex items-center space-x-1'
+              >
+                <LogIn className='h-4 w-4' />
+                <span className='hidden sm:inline'>Login</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
