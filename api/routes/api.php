@@ -16,6 +16,15 @@ Route::get('/test', function () {
     ]);
 });
 
+// Debug registration test
+Route::post('/test-register', function (Request $request) {
+    return response()->json([
+        'message' => 'Registration endpoint reached!',
+        'received_data' => $request->all(),
+        'timestamp' => now()
+    ]);
+});
+
 // Handle OPTIONS requests for all API routes
 Route::options('{any}', function () {
     return response('', 200)

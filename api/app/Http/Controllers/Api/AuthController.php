@@ -15,25 +15,47 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            // Step 1: Basic validation
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            // Step 2: Check if email already exists (without unique validation)
+            $existingUser = User::where('email', $request->email)->first();
+            if ($existingUser) {
+                return response()->json([
+                    'error' => 'Email already exists',
+                    'message' => 'A user with this email already exists'
+                ], 422);
+            }
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+            // Step 3: Create user with simplified password hashing
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-            'message' => 'Registration successful'
-        ], 201);
+            // Step 4: Create token
+            $token = $user->createToken('auth-token')->plainTextToken;
+
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+                'message' => 'Registration successful'
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Registration failed',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
     }
 
     /**

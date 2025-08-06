@@ -1,6 +1,15 @@
 import { Button } from '@/components/ui/button'
 import { APP_NAME } from '@/lib/constants'
-import { Search, BookOpen, Star, User, LogIn, LogOut } from 'lucide-react'
+import {
+  Search,
+  BookOpen,
+  Star,
+  User,
+  LogIn,
+  LogOut,
+  Plus,
+  LayoutDashboard,
+} from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -69,7 +78,30 @@ export function Navigation() {
 
             {user ? (
               <>
-                <Button variant='ghost' size='sm' className='flex items-center space-x-1'>
+                <Button
+                  variant={isActive('/contribute') ? 'default' : 'ghost'}
+                  size='sm'
+                  onClick={() => navigate('/contribute')}
+                  className='flex items-center space-x-1'
+                >
+                  <Plus className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Contribute</span>
+                </Button>
+                <Button
+                  variant={isActive('/dashboard') ? 'default' : 'ghost'}
+                  size='sm'
+                  onClick={() => navigate('/dashboard')}
+                  className='flex items-center space-x-1'
+                >
+                  <LayoutDashboard className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Dashboard</span>
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='flex items-center space-x-1 cursor-pointer'
+                  onClick={() => navigate('/dashboard')}
+                >
                   <User className='h-4 w-4' />
                   <span className='hidden sm:inline'>{user.name}</span>
                 </Button>

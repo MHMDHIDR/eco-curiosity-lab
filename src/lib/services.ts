@@ -67,13 +67,24 @@ export const speciesService = {
   getBySlug: (slug: string) => api.get<{ data: Species }>(`/species/${slug}`),
   search: (query: string) => api.get<{ data: Species[] }>(`/search?q=${query}`),
   create: (data: Partial<Species>) => api.post<{ data: Species }>('/species', data),
+  update: (slug: string, data: Partial<Species>) =>
+    api.patch<{ data: Species }>(`/species/${slug}`, data),
+  delete: (slug: string) => api.delete(`/species/${slug}`),
+  getMySpecies: () => api.get<{ data: Species[] }>('/my-species'),
 }
 
 export const contributionService = {
+  getAll: (params?: { status?: string; type?: string }) =>
+    api.get<{ data: Contribution[] }>('/contributions', { params }),
   getMyContributions: () => api.get<{ data: Contribution[] }>('/my-contributions'),
+  getById: (id: number) => api.get<{ data: Contribution }>(`/contributions/${id}`),
   create: (data: Partial<Contribution>) =>
     api.post<{ data: Contribution }>('/contributions', data),
   update: (id: number, data: Partial<Contribution>) =>
     api.patch<{ data: Contribution }>(`/contributions/${id}`, data),
   delete: (id: number) => api.delete(`/contributions/${id}`),
+  approve: (id: number, notes?: string) =>
+    api.post(`/contributions/${id}/approve`, { notes }),
+  reject: (id: number, notes?: string) =>
+    api.post(`/contributions/${id}/reject`, { notes }),
 }

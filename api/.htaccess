@@ -29,15 +29,20 @@
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# CORS Headers for API
+# CORS Headers for API - Dynamic Origin Handling
 
 <IfModule mod_headers.c>
-    # Handle preflight OPTIONS requests
-    Header always set Access-Control-Allow-Origin "https://ecocuriositylab.me"
+    # Handle multiple allowed origins
+    SetEnvIf Origin "^(https://ecocuriositylab\.me|http://localhost:8080|http://localhost:3000|http://localhost:5173|http://127\.0\.0\.1:8080|http://127\.0\.0\.1:3000|http://127\.0\.0\.1:5173)$" AccessControlAllowOrigin=$0
+
+    Header always set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
     Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE, PATCH"
     Header always set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control"
     Header always set Access-Control-Allow-Credentials "true"
     Header always set Access-Control-Max-Age "3600"
+
+    # Fallback for local development
+    Header always set Access-Control-Allow-Origin "*" "expr=%{HTTP:Origin} =~ m#^http://localhost#"
 
     # Handle actual requests
     SetEnvIf Origin "https://ecocuriositylab.me" CORS_ALLOWED_ORIGIN=$0
